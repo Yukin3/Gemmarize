@@ -271,7 +271,7 @@ export default function UploadPage() {
               </p>
               <div className="mt-6">
                 <Textarea
-                  placeholder="Include custom instructions for the Gemmary (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
+                  placeholder="Include custom instructions for Gemma (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
                   className="min-h-[100px]"
@@ -293,7 +293,7 @@ export default function UploadPage() {
               </p>
               <div className="mt-6">
                 <Textarea
-                  placeholder="Include custom instructions for the Gemmary (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
+                  placeholder="Include custom instructions for Gemma (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
                   className="min-h-[100px]"
@@ -315,7 +315,7 @@ export default function UploadPage() {
               </p>
               <div className="mt-6">
                 <Textarea
-                  placeholder="Include custom instructions for the Gemmary (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
+                  placeholder="Include custom instructions for Gemma (e.g., 'Focus on methodology only', 'Use bullet points', 'Highlight key points')"
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
                   className="min-h-[100px]"
