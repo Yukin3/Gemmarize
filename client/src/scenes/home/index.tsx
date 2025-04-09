@@ -48,13 +48,13 @@ export default function Home() {
                 instructions, Gemma creates the best possible way for you process information.
               </p>
               <div className="flex gap-4 pt-4">
-                <Link to="/rooms">
+                <Link to="/summarize">
                   <Button size="lg" className="gap-2" onClick={() => console.log("Start Quiz button clicked")}>
                     <Rocket className="h-5 w-5" />
                         Gemmarize Now
                   </Button>
                 </Link>
-                <Link to="/agents">
+                <Link to="/flashcards" target="_blank">
                   <Button size="lg" variant="outline">
                     Explore Capabilities
                   </Button>
@@ -115,7 +115,7 @@ export default function Home() {
             <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
               Make your first Gemmary now and discover the power of AI-assisted learning
             </p>
-            <Link to="/gearbox">
+            <Link to="/summarize" target="_blank">
               <Button size="lg" variant="secondary" className="gap-2">
                 <PencilRuler className="h-5 w-5" />
                 Gemmarize Anything

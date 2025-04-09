@@ -19,7 +19,7 @@ export default function Footer() {
               <span className="text-xl font-bold">Gemmarize</span>
             </div>
             <div className="flex gap-8">
-              <Link to="/about" className="text-muted-foreground hover:text-primary">
+              <Link to="https://github.com/Yukin3/Gemmarize" className="text-muted-foreground hover:text-primary">
                 About
               </Link>
               <Link to="/privacy" className="text-muted-foreground hover:text-primary">
@@ -28,7 +28,7 @@ export default function Footer() {
               <Link to="/terms" className="text-muted-foreground hover:text-primary">
                 Terms
               </Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-primary">
+              <Link to="https://www.linkedin.com/messaging/compose/?recipient=mmokutu" className="text-muted-foreground hover:text-primary">
                 Contact
               </Link>
             </div>
