@@ -4,10 +4,23 @@ const app = express();
 const cors = require("cors");
 const connectToDB = require("./config/db");
 
+const allowedOrigins = [
+  "http://localhost:5173", // dev client
+  "https://gemmarize.vercel.app" // prod client
+];
 
 
 //middleware
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  // credentials: true, //TODO: fix(auth): enable for cookies + auth headers
+}));
 app.use(express.json())
 connectToDB();
 
