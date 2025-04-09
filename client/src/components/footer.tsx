@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { IconZodiacGemini, IconBrandGithub, IconBrandLinkedin, IconWorld, IconCircleLetterD } from '@tabler/icons-react';
+import { IconZodiacGemini, IconBrandGithub, IconBrandLinkedin, IconWorld,
+  //  IconCircleLetterD 
+  } from '@tabler/icons-react';
 
 
 export default function Footer() {
@@ -45,9 +47,9 @@ export default function Footer() {
             <a href="https://yukin3.github.io/PersonalPortfolio/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
               <IconWorld className="h-6 w-6 text-primary dark:text-stone-400" />
             </a>
-            <a href="https://devpost.com/Yukin3" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+            {/* <a href="https://devpost.com/Yukin3" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
               <IconCircleLetterD className="h-6 w-6 text-primary dark:text-cyan-800" />
-            </a>
+            </a> */}
           </div>
         </div>
         ) : (
@@ -72,9 +74,9 @@ export default function Footer() {
             <a href="https://yukin3.github.io/PersonalPortfolio/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
               <IconWorld className="h-6 w-6 text-primary dark:text-stone-400" />
             </a>
-            <a href="https://devpost.com/Yukin3" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+            {/* <a href="https://devpost.com/Yukin3" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
               <IconCircleLetterD className="h-6 w-6 text-primary dark:text-cyan-800" />
-            </a>
+            </a> */}
           </div>
         </div>
         )}

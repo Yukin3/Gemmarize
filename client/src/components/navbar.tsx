@@ -7,6 +7,8 @@ import ProfileMenu from "@/components/profile-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuthStore } from "@/hooks/useAuthStore"
+import { useState } from "react"
+import { Menu, X } from "lucide-react" 
 
 
 export interface User {
@@ -25,7 +27,8 @@ export interface User {
 
 export default function Navbar() {
     // const { user, refreshUser } = useAuthStore();
-    const user = useAuthStore((state) => state.user)
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const user = useAuthStore((state) => state.user);
 
 
     const displayAvatar =
@@ -63,6 +66,13 @@ export default function Navbar() {
                     <Link to="/flashcards" className="font-medium hover:text-primary">Flashcards</Link>
                     <Link to="/explore" className="font-medium hover:text-primary">Explore</Link>              
                     </nav>
+
+                    {/* Mobile Hamburger */}
+                    <div className="md:hidden">
+                    <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </Button>
+                    </div>
 
                 {/* R: Display toggle & Auth/User */}
                 <div className="flex items-center gap-4">
@@ -112,6 +122,29 @@ export default function Navbar() {
                     )}
                 </div>
             </div>
+            {isMenuOpen && (
+            <div className="md:hidden px-4 pb-4">
+                <nav className="flex flex-wrap gap-2 justify-center">
+                {showDashboard && (
+                    <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Dashboard</Button>
+                    </Link>
+                )}
+                <Link to="/papers" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Papers</Button>
+                </Link>
+                <Link to="/summarize" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Summarize</Button>
+                </Link>
+                <Link to="/flashcards" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Flashcards</Button>
+                </Link>
+                <Link to="/explore" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Explore</Button>
+                </Link>
+                </nav>
+            </div>
+            )}
         </header>
     );
 }
