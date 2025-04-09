@@ -1,0 +1,30 @@
+/* Flashcard 3D flip effect */
+.flashcard-perspective {
+  perspective: 1000px;
+}
+
+.flashcard-3d {
+  transform-style: preserve-3d;
+}
+
+.flashcard-face {
+  backface-visibility: hidden;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+.flashcard-rotate {
+  transform: rotateY(180deg);
+}
+
+/* Hover effects */
+.flashcard-hover {
+  transition: transform 0.1s ease-in-out;
+}
+
+.flashcard-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+} 
