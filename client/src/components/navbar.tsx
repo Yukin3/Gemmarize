@@ -57,15 +57,32 @@ export default function Navbar() {
                 </div>
 
                 {/* Nav links (mobile: hidden) */}
-                <nav className="hidden md:flex gap-6">
-                    {showDashboard && (
-                        <Link to="/dashboard" className="font-medium hover:text-primary">Dashboard</Link>
-                    )}
-                    <Link to="/papers" className="font-medium hover:text-primary">Papers</Link>
-                    <Link to="/summarize" className="font-medium hover:text-primary">Summarize</Link>
-                    <Link to="/flashcards" className="font-medium hover:text-primary">Flashcards</Link>
-                    <Link to="/explore" className="font-medium hover:text-primary">Explore</Link>              
-                    </nav>
+                <nav className="hidden md:flex gap-6 items-center">
+                {showDashboard && (
+                    <Link to="/dashboard" className="font-medium hover:text-primary">Dashboard</Link>
+                )}
+                <Link to="/upload" className="font-medium hover:text-primary">Upload</Link>
+
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <Button variant="ghost" className="font-medium">Explore</Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="flex flex-col space-y-2 w-48">
+                    <Link to="/papers">
+                        <Button variant="ghost" className="w-full justify-start">Papers</Button>
+                    </Link>
+                    <Link to="/flashcards">
+                        <Button variant="ghost" className="w-full justify-start">Flashcards</Button>
+                    </Link>
+                    <Link to="/summaries">
+                        <Button variant="ghost" className="w-full justify-start">Summaries</Button>
+                    </Link>
+                    <Link to="/quizzes">
+                        <Button variant="ghost" className="w-full justify-start">Quizzes</Button>
+                    </Link>
+                    </PopoverContent>
+                </Popover>
+                </nav>
 
                     {/* Mobile Hamburger */}
                     <div className="md:hidden">
@@ -79,45 +96,44 @@ export default function Navbar() {
                     <ThemeToggle />
 
                     {user ? (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Avatar className="h-10 w-10 cursor-pointer hover:scale-105 transition-transform">
-                                    <AvatarImage src={user.profile_picture} alt={user.name} />
-                                    <AvatarFallback>{user.name?.charAt(0) || "G"}</AvatarFallback>
-                                </Avatar>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 mt-2 shadow-lg">
-                                <ProfileMenu
-                                    name={user.name}
-                                    role={userRole}
-                                    avatar={displayAvatar}
-                               />
-                            </PopoverContent>
-                        </Popover>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Avatar className="h-10 w-10 cursor-pointer hover:scale-105 transition-transform">
+                            <AvatarImage src={user.profile_picture} alt={user.name} />
+                            <AvatarFallback>{user.name?.charAt(0) || "G"}</AvatarFallback>
+                        </Avatar>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64 mt-2 shadow-lg">
+                        <ProfileMenu
+                            name={user.name}
+                            role={userRole}
+                            avatar={displayAvatar}
+                        />
+                        </PopoverContent>
+                    </Popover>
                     ) : (
                         <>
-                            {/* <Link to="/login">
-                                <Button variant="outline">Login</Button>
-                            </Link> */}
-                            {/* <Link to="/signup">
-                                <Button>Sign In</Button>
-                            </Link> */}
-                            <Button
-                            // variant="ghost"
-                            onClick={() =>
-                                useAuthStore.getState().setUser({
-                                id: "guest-001",
-                                name: "Guest User",
-                                email: "guest@cyberwatch.local",
-                                profile_picture: "https://api.dicebear.com/7.x/initials/svg?seed=Guest",
-                                role: "user",
-                                username: "guest",
-                                })
-                            }
-                            >
-                            Continue as Guest
-                            </Button>
-
+                        <Link to="/login">
+                            <Button variant="outline">Login</Button>
+                        </Link> 
+                        <Link to="/signup">
+                            <Button>Sign In</Button>
+                        </Link>
+                        {/* <Button
+                        // variant="ghost"
+                        onClick={() =>
+                            useAuthStore.getState().setUser({
+                            id: "guest-001",
+                            name: "Guest User",
+                            email: "guest@cyberwatch.local",
+                            profile_picture: "https://api.dicebear.com/7.x/initials/svg?seed=Guest",
+                            role: "user",
+                            username: "guest",
+                            })
+                        }
+                        >
+                        Continue as Guest
+                        </Button> */}
                         </>
                     )}
                 </div>
@@ -130,18 +146,28 @@ export default function Navbar() {
                     <Button variant="ghost" size="sm">Dashboard</Button>
                     </Link>
                 )}
-                <Link to="/papers" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm">Papers</Button>
+                <Link to="/upload" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="ghost" size="sm">Upload</Button>
                 </Link>
-                <Link to="/summarize" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm">Summarize</Button>
-                </Link>
-                <Link to="/flashcards" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm">Flashcards</Button>
-                </Link>
-                <Link to="/explore" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="ghost" size="sm">Explore</Button>
-                </Link>
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <Button variant="ghost" className="font-medium">Explore</Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="flex flex-col space-y-2 w-48">
+                    <Link to="/papers">
+                        <Button variant="ghost" className="w-full justify-start">Papers</Button>
+                    </Link>
+                    <Link to="/flashcards">
+                        <Button variant="ghost" className="w-full justify-start">Flashcards</Button>
+                    </Link>
+                    <Link to="/summaries">
+                        <Button variant="ghost" className="w-full justify-start">Summaries</Button>
+                    </Link>
+                    <Link to="/quizzes">
+                        <Button variant="ghost" className="w-full justify-start">Quizzes</Button>
+                    </Link>
+                    </PopoverContent>
+                </Popover>
                 </nav>
             </div>
             )}

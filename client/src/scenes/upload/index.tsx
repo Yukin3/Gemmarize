@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 
-export default function Summarize() {
+export default function Uploads() {
   return (
     <div className="relative min-h-screen">
       <main className="p-4 pt-24 flex items-center justify-center">
-      <Outlet /> {/* Child (summary) pages */}
+      <Outlet /> {/* Child (upload) pages */}
       </main>
 
     </div>

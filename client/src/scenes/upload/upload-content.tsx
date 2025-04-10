@@ -3,6 +3,7 @@
 // import type React from "react"
 
 import {
+  useRef,
   //  useEffect,
     useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ import { summarizeContent } from "@/hooks/summarizer"
 import { useFlashcardGenerator } from "@/hooks/flashcardGenerator"
 import { useToast } from "@/hooks/use-toast"
 import UploadProgress from "@/components/upload-progress"
+import { useQuizGenerator } from "@/hooks/quizGenerator"
 
 
 
@@ -29,13 +31,18 @@ export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [instructions, setInstructions] = useState("")
   const { toast } = useToast()
-  const generationOptions = ["summary", "flashcards", "quizzes"] as const
+  const generationOptions = ["summaries", "flashcards", "quizzes"] as const
   type GenerationType = (typeof generationOptions)[number]
   const [selectedOptions, setSelectedOptions] = useState<GenerationType[]>([])
   const { generateFlashcards } = useFlashcardGenerator()
+  const { generateQuiz } = useQuizGenerator();
   const [showResultCards, setShowResultCards] = useState(false)
   const [lastPaperId, setLastPaperId] = useState<string | null>(null)
+  const [lastGeneratedQuizId, setLastGeneratedQuizId] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState("Preparing the Gemmarization...");
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const messageIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const funnyMessages = [
     "Thinking very hard...",
@@ -60,134 +67,159 @@ export default function UploadPage() {
 
 
 
-  const simulateUploadProgress = () => {
-    setIsUploading(true)
-    setUploadProgress(0)
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          return 100
-        }
-        return prev + 10
-      })
-    }, 300)
-
-    return interval
-  }
-
-  const messageInterval = setInterval(() => {
-    setLoadingMessage((prev) => {
-      let next;
-      do {
-        next = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
-      } while (next === prev); // Avoid repeating the same message
-      return next;
-    });
-  }, 500);
+  // const simulateUploadProgress = () => {
+  //   setIsUploading(true);
+  //   setUploadProgress(0);
+  
+  //   const interval = setInterval(() => {
+  //     setUploadProgress((prev) => {
+  //       if (prev >= 100) {
+  //         clearInterval(interval);
+  //         return 100;
+  //       }
+  //       return prev + 5;
+  //     });
+  //   }, 300);
+  
+  //   progressIntervalRef.current = interval;
+  // };
+  
+  // const messageInterval = setInterval(() => {
+  //   setLoadingMessage((prev) => {
+  //     let next;
+  //     do {
+  //       next = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+  //     } while (next === prev); // Avoid repeating the same message
+  //     return next;
+  //   });
+  // }, 500);
   
 
   const handleUpload = async () => {
-    const progressInterval = simulateUploadProgress()
-
+    setIsUploading(true);
+    setUploadProgress(0);
+  
+    // Simulate fake progress
+    progressIntervalRef.current = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 100) {
+          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+          return 100;
+        }
+        return prev + 5;
+      });
+    }, 300);
+  
+    // Funny message interval
+    messageIntervalRef.current = setInterval(() => {
+      setLoadingMessage((prev) => {
+        let next;
+        do {
+          next = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+        } while (next === prev);
+        return next;
+      });
+    }, 1200);
+  
     try {
-        let content: string | File | undefined
-        let contentType:"text" | "email" | "document" | undefined
-
+      let content: string | File | undefined;
+      let contentType: "text" | "email" | "document" | undefined;
+  
       if (activeTab === "document") {
         if (!selectedFile) {
           toast({
             title: "No file selected",
             description: "Please select a PDF or Word document.",
             variant: "destructive",
-          })
-          clearInterval(progressInterval)
-          setIsUploading(false)
-          return
+          });
+          return cleanUpUpload();
         }
-        content = selectedFile
-        contentType = "document"
+        content = selectedFile;
+        contentType = "document";
       } else if (activeTab === "text" || activeTab === "email") {
         if (!textContent.trim()) {
           toast({
             title: "No content provided",
             description: `Please enter any ${activeTab} content to Gemmarize`,
             variant: "destructive",
-          })
-          clearInterval(progressInterval)
-          setIsUploading(false)
-          return
+          });
+          return cleanUpUpload();
         }
-        content = textContent
-        contentType = activeTab as "text" | "email"
-    }
-
-
-    if (!content || !contentType) {
-      toast({
+        content = textContent;
+        contentType = activeTab;
+      }
+  
+      if (!content || !contentType) {
+        toast({
           title: "Unsupported content",
           description: "Only text, tweet, and email are supported for now.",
           variant: "destructive",
-        })
-        clearInterval(progressInterval)
-        setIsUploading(false)
-        return
+        });
+        return cleanUpUpload();
       }
   
-
-      //TODO: FIX(API): fix api call
-      const result = await summarizeContent(content, contentType, instructions);
+      let result: { paperId: string; summary?: string } | null = null;
+      const shouldGenerateSummary = selectedOptions.includes("summaries") || selectedOptions.length === 0;
+  
+      result = await summarizeContent(content, contentType, instructions);
       setLastPaperId(result.paperId);
-      toast({
-        title: "Gemmary Complete",
-        description: `Gemmary for: paperID: ${result.paperId} |  ${result.summary}`,
-      })
-      
-      console.log("SUMMARY TEXT:", result.summary)
-
-      setShowResultCards(true) //TODO: fix(UI): handle results display
-      // Generate flashcards if selected
-      if (selectedOptions.includes("flashcards") && result.paperId) {
-        await generateFlashcards(result.paperId)
+  
+      if (shouldGenerateSummary) {
+        toast({
+          title: "Gemmary Complete",
+          description: `Gemmary for: paperID: ${result.paperId} | ${result.summary}`,
+        });
+        console.log("SUMMARY TEXT:", result.summary);
       }
-      //TODO: fix(UI): generate quizzes
-
-
-      
-      // Ensure progress completes
+  
+      setShowResultCards(true);
+  
+      if (selectedOptions.includes("flashcards") && result.paperId) {
+        await generateFlashcards(result.paperId);
+      }
+  
+      if (selectedOptions.includes("quizzes") && result.paperId) {
+        const rawText = typeof content === "string" ? content : await content.text();
+        const quizRes = await generateQuiz(result.paperId, rawText, contentType, instructions);
+  
+        if (quizRes?.quiz?._id) {
+          setLastGeneratedQuizId(quizRes.quiz._id);
+          console.log("🎉 Generated quiz with ID:", quizRes.quiz._id);
+        }
+      }
+  
+      // Finish up after delay
       setTimeout(() => {
-        clearInterval(progressInterval)
-        setUploadProgress(100)
-        clearInterval(messageInterval);
-
-
+        cleanUpUpload();
+        setUploadProgress(100);
+  
         setTimeout(() => {
-          setIsUploading(false)
-          setSelectedFile(null)
-          setTextContent("")
-
-
+          setSelectedFile(null);
+          setTextContent("");
           toast({
             title: "Upload successful",
             description: "Your content has been submitted for moderation",
-          })
-        }, 500)
-      }, 1000)
+          });
+        }, 500);
+      }, 1000);
     } catch (err) {
-        console.error("Upload failed:", err)
-      clearInterval(progressInterval)
-      clearInterval(messageInterval);
-      setIsUploading(false)
-
+      console.error("Upload failed:", err);
+      cleanUpUpload();
       toast({
         title: "Upload failed",
         description: "There was an error uploading your content",
         variant: "destructive",
-      })
+      });
     }
-  }
-
+  };
+  
+  // Clean-up helper
+  const cleanUpUpload = () => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+    setIsUploading(false);
+  };
+  
   const handleOptionToggle = (option: GenerationType) => {
     setSelectedOptions((prev) =>
       prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
@@ -196,22 +228,25 @@ export default function UploadPage() {
 
 
 
-  const handleResultCardClick = (type: GenerationType) => {  
-    if (type === "summary") {
-     const url = `/summarize/paper/${lastPaperId}`;
-      // Open in a new tab
-       window.open(url, '_blank');
-    } else {
-      const url = `/flashcards/paper/${lastPaperId}`;
-      // Open in a new tab
-      window.open(url, '_blank');
+  const handleResultCardClick = (type: GenerationType) => {
+    if (type === "quizzes") {
+      const url = `/${type}/details/${lastPaperId}`;
+      window.open(url, "_blank");
+      if (!lastGeneratedQuizId) return;
+      return;
     }
+  
+    if (!lastPaperId) return;
+    const url = `/${type}/paper/${lastPaperId}`;
+    window.open(url, "_blank");
   };
+  
+  
   
 
   return (
     <div className="container max-w-4xl py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">Upload Content for Gemmarization</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Upload Content to Gemmarize</h1>
 
       <Card>
         <CardHeader>
@@ -299,7 +334,7 @@ export default function UploadPage() {
                   className="min-h-[100px]"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  These instructions will be passed to Gemini to guide the Gemmarization.
+                  These instructions will be passed to Gemma.
                 </p>
               </div>
             </TabsContent>

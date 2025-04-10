@@ -1,53 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
+import { useSummary } from "@/hooks/useSummary"
 
-interface Summary {
-  paperId: string
-  title: string
-  summary: string
-}
 
 export default function SummariesPage() {
   const { paperId } = useParams()
   const navigate = useNavigate()
-  const [summary, setSummary] = useState<Summary | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { summary, paper, loading, error } = useSummary(paperId)
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api"
-
-  useEffect(() => {
-    async function fetchSummary() {
-      try {
-        if (!paperId) {
-          setError("No paper ID provided")
-          setLoading(false)
-          return
-        }
-
-        const response = await fetch(`${API_URL}/summaries/${paperId}`)
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch summary")
-        }
-
-        const data = await response.json()
-        setSummary(data)
-      } catch (err) {
-        console.error("Error fetching summary:", err)
-        setError("Failed to load summary. Please try again later.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchSummary()
-  }, [paperId, API_URL])
 
   return (
     <div className="container max-w-4xl min-h-screen py-6 flex flex-col">
@@ -62,6 +26,13 @@ export default function SummariesPage() {
         </Button>
         <h1 className="text-2xl font-semibold">Summary</h1>
       </div>
+
+      {paper?.instructions && (
+        <div className="mb-4 text-sm text-muted-foreground">
+          <strong>Instructions:</strong> {paper.instructions}
+        </div>
+      )}
+
 
       <div className="flex-1 flex flex-col items-center justify-center">
         {loading ? (
