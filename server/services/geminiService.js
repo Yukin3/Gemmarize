@@ -128,6 +128,97 @@ ${content.slice(0, 3000)}
   }
 }
 
+async function generateQuizFromPaper(content, instructions = "") {
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-002" });
+
+  const prompt = `
+  You are a professional quiz generator.
+  
+  Given a document, please generate:
+  1. A short, descriptive **title** for the quiz (e.g., "Intro to Quantum Mechanics")
+  2. A **brief description** (1–2 sentences) explaining the quiz topic and what it covers. Mention any specific themes, learning outcomes, or difficulty level.
+  3. A list of up to 20 questions (unless otherwise instructed)
 
 
-module.exports = { summarizeTextWithGemini, generateTagsFromPaper,  generateFlashcardsFromPaper, };
+  
+  📌 Rules:
+  - MAX 20 questions unless otherwise instructed
+  - Every question must include:
+    - question_number (starts at 1)
+    - question (text of the question)
+    - answer (the correct answer)
+    - rationale (explanation for the answer)
+    - type (e.g., "short", "mcq", or "t/f")
+  
+  📌 For "mcq" type questions:
+  - Include an "options" array with 3–5 answer choices
+  - Include a "correct_option_index" to indicate the correct answer
+
+  📌 For "t/f" type questions:
+  - Include an "options" array with the options "True" or "False"
+  - Include a "correct_option_index" to indicate the correct answer (0 for "True", 1 for "False")
+
+  ❗️Only return **raw JSON** that matches the format below — no commentary, markdown, or code fences:❗️
+
+  
+  📌 Example Response Format:
+  {
+    "title": "Short Quiz Title",
+    "description": "Brief 1-2 sentence description of the quiz. Include topic and any important specifics.",
+    "questions": [
+      {
+        "question_number": 1,
+        "question": "What is the capital of France?",
+        "answer": "Paris",
+        "rationale": "Paris is the capital of France.",
+        "type": "mcq",
+        "options": ["Paris", "London", "Rome", "Berlin"],
+        "correct_option_index": 0
+      }
+      // more questions...
+
+    ]
+  }
+  
+  ${
+    instructions
+      ? `Special instructions from user: ${instructions}`
+      : "If no style is specified, mix between t/f and mcq questions."
+  }
+  
+  --- Document Content ---
+  ${content.slice(0, 5000)}
+  `;
+  
+  const result = await model.generateContent({
+    contents: [{ parts: [{ text: prompt }] }],
+  });
+
+  const response = await result.response;
+  let raw = response.text().trim();
+
+  // Strip markdown if any
+  if (raw.startsWith("```")) {
+    raw = raw.replace(/```(?:json)?/gi, "").replace(/```$/, "").trim();
+  }
+
+// Remove items before first "{" + after last "}"
+  raw = raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
+
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed?.questions || !Array.isArray(parsed.questions)) {
+      throw new Error("Missing or invalid questions array.");
+    }
+    return parsed;
+  } catch (err) {
+    console.error("❌ Failed to parse quiz JSON:", err);
+    throw new Error("Gemini quiz generation failed");
+  }
+}
+
+
+
+
+module.exports = { summarizeTextWithGemini, generateTagsFromPaper,  generateFlashcardsFromPaper,   generateQuizFromPaper,  };

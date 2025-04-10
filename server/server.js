@@ -21,7 +21,9 @@ app.use(cors({
   },
   // credentials: true, //TODO: fix(auth): enable for cookies + auth headers
 }));
-app.use(express.json())
+// app.use(express.json())
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 connectToDB();
 
 
@@ -39,6 +41,8 @@ const paperRoutes = require("./routes/paperRoutes")
 app.use("/api", paperRoutes);
 const flashcardRoutes = require("./routes/flashcardRoutes")
 app.use("/api/flashcards", flashcardRoutes);
+const quizRoutes = require("./routes/quizRoutes");
+app.use("/api/quizzes", quizRoutes);
 
 
 
